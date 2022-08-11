@@ -1,0 +1,51 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String        @id @default(cuid())
+  firstName String        
+  lastName  String?
+  emailId   String        @unique
+  isActive  Boolean       @default(true)
+  createdAt DateTime      @default(now())
+  updatedAt DateTime?     @updatedAt()
+  posts     Post[]
+  comments  Comment[]
+  @@map(name:"user")
+}
+
+
+model Post {
+  id              String        @id @default(cuid())
+  content         String
+  createdBy       String
+  owner           User          @relation(fields: [createdBy], references: [id])
+  isActive        Boolean       @default(true)
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime?     @updatedAt()
+  comments        Comment[]
+  @@map(name:"post")
+}
+
+
+model Comment {
+  id              String        @id @default(cuid())
+  content         String 
+  createdBy       String
+  postId          String        
+  post            Post          @relation(fields: [postId], references: [id])
+  owner           User          @relation(fields: [createdBy], references: [id])
+  isActive        Boolean       @default(true)
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime?     @updatedAt()
+  @@map(name:"comment")
+}
